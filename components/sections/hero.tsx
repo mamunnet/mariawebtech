@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
+import Link from 'next/link';
+import { ContactFormModal } from '@/components/contact-form-modal';
+import { useState } from 'react';
 
 function AnimatedSphere() {
   return (
@@ -30,12 +33,14 @@ const pathVariants = {
       duration: 3,
       ease: "easeInOut",
       repeat: Infinity,
-      repeatType: "reverse" as const // Fix: Explicitly type repeatType
+      repeatType: "loop" as const
     }
   }
 };
 
 export function HeroSection() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <section className="min-h-screen pt-32 lg:pt-0 flex items-center relative overflow-hidden bg-black">
       {/* Background gradient */}
@@ -99,11 +104,22 @@ export function HeroSection() {
             and technology to deliver exceptional digital experiences.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => setIsContactModalOpen(true)}
+            >
               Get Started
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
-              View Our Work
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-primary text-primary hover:bg-primary/10"
+              asChild
+            >
+              <Link href="/portfolio">
+                View Our Work
+              </Link>
             </Button>
           </div>
         </motion.div>
@@ -153,6 +169,12 @@ export function HeroSection() {
           />
         </motion.div>
       </div>
+
+      {/* Contact Form Modal */}
+      <ContactFormModal 
+        open={isContactModalOpen} 
+        onOpenChange={setIsContactModalOpen} 
+      />
     </section>
   );
 }
