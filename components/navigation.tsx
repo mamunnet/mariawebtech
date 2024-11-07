@@ -7,9 +7,10 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, Settings, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ContactFormModal } from '@/components/contact-form-modal';
 
 const services = [
-  { href: '/services', label: 'All Services' }, // Added All Services as first item
+  { href: '/services', label: 'All Services' },
   { href: '/services/ui-ux-design', label: 'UI/UX Design' },
   { href: '/services/web-development', label: 'Web Development' },
   { href: '/services/digital-marketing', label: 'Digital Marketing' },
@@ -34,6 +35,7 @@ export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -150,7 +152,12 @@ export function Navigation() {
                   )}
                 </div>
               ))}
-              <Button className="bg-primary hover:bg-primary/90">Get Started</Button>
+              <Button 
+                className="bg-primary hover:bg-primary/90"
+                onClick={() => setIsContactModalOpen(true)}
+              >
+                Get Started
+              </Button>
             </div>
 
             {/* Mobile Right Icons */}
@@ -203,7 +210,13 @@ export function Navigation() {
                   </div>
                 ))}
                 <div className="pt-2">
-                  <Button className="w-full bg-primary hover:bg-primary/90">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsContactModalOpen(true);
+                    }}
+                  >
                     Get Started
                   </Button>
                 </div>
@@ -212,6 +225,12 @@ export function Navigation() {
           )}
         </AnimatePresence>
       </nav>
+
+      {/* Contact Form Modal */}
+      <ContactFormModal 
+        open={isContactModalOpen} 
+        onOpenChange={setIsContactModalOpen} 
+      />
 
       {/* WhatsApp Button */}
       <a
