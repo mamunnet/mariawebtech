@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Palette, Code, Layout, Megaphone, Rocket, Shield, Check } from 'lucide-react';
+import { Palette, Code, Layout, Megaphone, Rocket, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 const services = [
   {
@@ -16,9 +17,68 @@ const services = [
       'Visual Design',
       'Usability Testing',
     ],
-    slug: 'ui-ux-design',
+    href: '/services/ui-ux-design',
   },
-  // ... rest of the services array remains the same
+  {
+    icon: Code,
+    title: 'Web Development',
+    description: 'Build fast, scalable, and secure web applications using cutting-edge technologies.',
+    features: [
+      'Front-end Development',
+      'Back-end Development',
+      'API Integration',
+      'Database Design',
+    ],
+    href: '/services/web-development',
+  },
+  {
+    icon: Layout,
+    title: 'Responsive Design',
+    description: 'Ensure your website looks and works perfectly on all devices and screen sizes.',
+    features: [
+      'Mobile-First Design',
+      'Cross-Browser Compatibility',
+      'Performance Optimization',
+      'Accessibility Standards',
+    ],
+    href: '/services/responsive-design',
+  },
+  {
+    icon: Megaphone,
+    title: 'Digital Marketing',
+    description: 'Boost your online presence and reach your target audience effectively.',
+    features: [
+      'SEO Optimization',
+      'Content Strategy',
+      'Social Media Marketing',
+      'Analytics & Reporting',
+    ],
+    href: '/services/digital-marketing',
+  },
+  {
+    icon: Rocket,
+    title: 'E-commerce Solutions',
+    description: 'Create powerful online stores that drive sales and enhance customer experience.',
+    features: [
+      'Custom E-commerce Development',
+      'Payment Gateway Integration',
+      'Inventory Management',
+      'Shopping Cart Optimization',
+    ],
+    href: '/services/e-commerce',
+  },
+  {
+    icon: Shield,
+    title: 'Maintenance & Support',
+    description: 'Keep your digital assets secure, updated, and performing at their best.',
+    features: [
+      'Regular Updates & Backups',
+      'Security Monitoring',
+      'Performance Optimization',
+      '24/7 Technical Support',
+    ],
+    href: '/services/maintenance-support',
+  },
 ];
 
 export function ServicesSection() {
@@ -87,42 +147,11 @@ export function ServicesSection() {
               </defs>
             </svg>
 
-            {/* Heading text */}
-            <div className="relative">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 1.5 }}
-                className="h-1 bg-gradient-to-r from-primary via-yellow-500 to-primary absolute -top-2 left-0"
-              />
-              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-primary relative z-10">
-                Our Services
-              </h2>
-            </div>
-
-            {/* Animated checkmark */}
-            <motion.span
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-                delay: 0.5
-              }}
-              className="absolute -right-12 top-0 inline-flex items-center justify-center w-8 h-8 bg-green-500/20 rounded-full"
-            >
-              <motion.div
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.5, delay: 1 }}
-              >
-                <Check className="w-5 h-5 text-green-500" />
-              </motion.div>
-            </motion.span>
+            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-primary">
+              Our Services
+            </h2>
           </div>
 
-          {/* Subheading */}
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,7 +163,66 @@ export function ServicesSection() {
           </motion.p>
         </motion.div>
 
-        {/* Rest of the services section remains the same */}
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service, index) => (
+            <motion.div
+              key={service.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Link href={service.href}>
+                <Card className="h-full hover:bg-muted/50 transition-colors duration-300 cursor-pointer group">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300">
+                      <service.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle className="group-hover:text-primary transition-colors duration-300">
+                      {service.title}
+                    </CardTitle>
+                    <CardDescription>{service.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 mb-6">
+                      {service.features.map((feature) => (
+                        <li key={feature} className="flex items-center text-sm text-muted-foreground">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      variant="outline" 
+                      className="w-full group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+                    >
+                      Learn More
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* View All Services Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mt-12"
+        >
+          <Link href="/services">
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90"
+            >
+              View All Services
+            </Button>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
