@@ -6,7 +6,9 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import Link from 'next/link';
 import { ContactFormModal } from '@/components/contact-form-modal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 function AnimatedSphere() {
   return (
@@ -40,24 +42,60 @@ const pathVariants = {
 
 export function HeroSection() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [heroContent, setHeroContent] = useState({
+    title: 'We Create Digital Experiences',
+    subtitle: '',
+    description: 'Transform your brand with cutting-edge web solutions. We blend creativity and technology to deliver exceptional digital experiences.',
+    buttonText: 'Get Started',
+    buttonLink: '#contact'
+  });
+
+  useEffect(() => {
+    const fetchHeroContent = async () => {
+      try {
+        const docRef = doc(db, 'content', 'hero');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setHeroContent({
+            title: data.title || heroContent.title,
+            subtitle: data.subtitle || heroContent.subtitle,
+            description: data.description || heroContent.description,
+            buttonText: data.buttonText || heroContent.buttonText,
+            buttonLink: data.buttonLink || heroContent.buttonLink
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching hero content:', error);
+      }
+    };
+
+    fetchHeroContent();
+  }, []);
 
   return (
-    <section className="min-h-screen pt-32 lg:pt-0 flex items-center relative overflow-hidden bg-black">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-background/90 to-primary/5" />
+    <section className="h-[50vh] pt-6 lg:pt-0 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-black via-background to-primary/5 animate-gradient">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1),rgba(0,0,0,1))] opacity-80" />
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-yellow-500/20 to-primary/20 animate-gradient-x" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-background/50 to-primary/10 animate-gradient-y" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0),rgba(0,0,0,0.5))] animate-pulse" />
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-4 items-center relative">
         {/* Text Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="space-y-6"
+          className="space-y-4"
         >
           <div className="relative">
             {/* Animated SVG Path */}
             <svg
-              className="absolute -inset-4 w-[calc(100%+2rem)] h-[calc(100%+2rem)] pointer-events-none"
+              className="absolute -inset-2 w-[calc(100%+1.5rem)] h-[calc(100%+1.5rem)] pointer-events-none"
               style={{ filter: 'blur(1px)' }}
             >
               <motion.path
@@ -78,11 +116,13 @@ export function HeroSection() {
               </defs>
             </svg>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-primary relative z-10">
-              We Create
-              <span className="text-primary"> Digital</span>
-              <br />
-              Experiences
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-primary relative z-10">
+              {heroContent.title.split(' ').map((word, index) => (
+                <span key={index} className={word.toLowerCase() === 'digital' ? 'text-primary' : ''}>
+                  {word}{' '}
+                  {index === 2 && <br />}
+                </span>
+              ))}
             </h1>
 
             {/* Bottom decorative line */}
@@ -99,22 +139,22 @@ export function HeroSection() {
             />
           </div>
 
-          <p className="text-lg sm:text-xl text-gray-400 max-w-lg">
-            Transform your brand with cutting-edge web solutions. We blend creativity
-            and technology to deliver exceptional digital experiences.
+          <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-xl mt-3">
+            {heroContent.description}
           </p>
-          <div className="flex flex-wrap gap-4">
+
+          <div className="flex flex-wrap gap-3 mt-4">
             <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90"
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-base"
               onClick={() => setIsContactModalOpen(true)}
             >
-              Get Started
+              {heroContent.buttonText}
             </Button>
             <Button 
-              size="lg" 
+              size="lg"
               variant="outline" 
-              className="border-primary text-primary hover:bg-primary/10"
+              className="border-primary text-primary hover:bg-primary/10 text-base"
               asChild
             >
               <Link href="/portfolio">
@@ -129,7 +169,7 @@ export function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="h-[400px] w-full relative hidden lg:block"
+          className="h-[300px] lg:h-[400px] w-full relative hidden lg:block"
         >
           <Canvas camera={{ position: [0, 0, 5] }}>
             <ambientLight intensity={0.5} />
@@ -144,7 +184,7 @@ export function HeroSection() {
 
           {/* Decorative floating elements */}
           <motion.div
-            className="absolute top-1/4 left-1/4 w-16 h-16 bg-primary/20 rounded-full blur-xl"
+            className="absolute top-1/3 left-1/3 w-20 h-20 bg-primary/20 rounded-full blur-xl"
             animate={{
               y: [0, 20, 0],
               scale: [1, 1.1, 1],
@@ -156,7 +196,7 @@ export function HeroSection() {
             }}
           />
           <motion.div
-            className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-yellow-500/20 rounded-full blur-xl"
+            className="absolute bottom-1/3 right-1/3 w-24 h-24 bg-yellow-500/20 rounded-full blur-xl"
             animate={{
               y: [0, -30, 0],
               scale: [1, 1.2, 1],

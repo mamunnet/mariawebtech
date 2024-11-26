@@ -80,3 +80,20 @@
     linear-gradient(to right, rgb(var(--foreground) / 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgb(var(--foreground) / 0.05) 1px, transparent 1px);
 }
+
+@layer utilities {
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+  }
+
+  .animate-gradient-x {
+    background-size: 200% 100%;
+    animation: gradient-x 15s ease infinite;
+  }
+
+  .animate-gradient-y {
+    background-size: 100% 200%;
+    animation: gradient-y 15s ease infinite;
+  }
+}
