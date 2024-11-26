@@ -65,35 +65,121 @@ export function AboutCompany() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="space-y-6"
+            className="space-y-8"
           >
-            <div className="relative">
+            <div className="relative space-y-6">
+              <motion.div 
+                className="relative mb-12"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <div className="relative inline-block">
+                  {/* Background glow effect */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                    className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-yellow-500/20 to-primary/20 rounded-lg blur-xl"
+                  />
+                  
+                  {/* Top line with glow */}
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "60%", opacity: 1 }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                    className="absolute -top-4 left-0 h-[3px] rounded-full bg-gradient-to-r from-transparent via-primary to-transparent"
+                    style={{
+                      boxShadow: '0 0 10px var(--primary)'
+                    }}
+                  />
+
+                  {/* Main title */}
+                  <motion.div
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="relative"
+                  >
+                    <h2 className="text-4xl sm:text-5xl font-bold relative py-2">
+                      <span className="relative inline-block overflow-hidden">
+                        {/* Shimmer effect */}
+                        <motion.div
+                          animate={{
+                            x: ["-100%", "200%"],
+                          }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            repeatType: "loop",
+                            ease: "linear",
+                          }}
+                          className="absolute inset-0 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                        />
+                        
+                        {/* Title text */}
+                        <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-primary via-yellow-500 to-primary">
+                          {aboutContent.title}
+                        </span>
+                      </span>
+                    </h2>
+
+                    {/* Bottom line with glow */}
+                    <motion.div
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className="absolute -bottom-2 left-0 right-0 h-[2px] origin-left rounded-full bg-gradient-to-r from-primary via-yellow-500 to-primary"
+                      style={{
+                        boxShadow: '0 0 10px var(--primary)'
+                      }}
+                    />
+
+                    {/* Side accent lines */}
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: "100%" }}
+                      transition={{ duration: 0.8, delay: 0.3 }}
+                      className="absolute -left-6 top-0 w-[2px] rounded-full bg-gradient-to-b from-primary to-transparent"
+                      style={{
+                        boxShadow: '0 0 8px var(--primary)'
+                      }}
+                    />
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: "100%" }}
+                      transition={{ duration: 0.8, delay: 0.4 }}
+                      className="absolute -right-6 top-0 w-[2px] rounded-full bg-gradient-to-b from-primary to-transparent"
+                      style={{
+                        boxShadow: '0 0 8px var(--primary)'
+                      }}
+                    />
+                  </motion.div>
+                </div>
+              </motion.div>
               <div className="relative">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 1.5 }}
-                  className="h-1 bg-gradient-to-r from-primary via-yellow-500 to-primary absolute -top-2 left-0"
-                />
-                <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-yellow-500 to-primary inline-flex items-center">
-                  {aboutContent.title}
-                </h2>
+                <p className="text-lg text-gray-300 leading-relaxed">
+                  {aboutContent.content}
+                </p>
+                <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-primary/50 via-yellow-500/50 to-primary/50 rounded-full blur-sm" />
+              </div>
+              <div className="relative">
+                <p className="text-lg text-gray-300 leading-relaxed">
+                  {aboutContent.mission}
+                </p>
+                <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-primary/50 via-yellow-500/50 to-primary/50 rounded-full blur-sm" />
               </div>
             </div>
-            <p className="text-lg text-gray-300">
-              {aboutContent.content}
-            </p>
-            <p className="text-lg text-gray-300">
-              {aboutContent.mission}
-            </p>
+
             <Button 
-              className="group bg-primary hover:bg-primary/90" 
+              className="group bg-primary hover:bg-primary/90 relative overflow-hidden" 
               size="lg"
               asChild
             >
-              <a href={aboutContent.buttonLink} download>
+              <a href={aboutContent.buttonLink} download className="relative z-10">
                 <FileDown className="mr-2 h-5 w-5 transition-transform group-hover:-translate-y-1" />
                 {aboutContent.buttonText}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary via-yellow-500 to-primary opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
               </a>
             </Button>
           </motion.div>
@@ -116,6 +202,8 @@ export function AboutCompany() {
                   src={aboutContent.imageUrl}
                   alt={aboutContent.imageAlt}
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 

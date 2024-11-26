@@ -57,11 +57,255 @@ export default function ContentEditor({ section }: ContentEditorProps) {
     }
   };
 
-  const handleChange = (field: string, value: string) => {
+  const handleFieldChange = (field: string, value: any) => {
     setContent((prev: any) => ({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const getFieldsForSection = (section: string) => {
+    switch (section) {
+      case 'hero':
+        return [
+          { name: 'title', label: 'Title', type: 'text' },
+          { name: 'subtitle', label: 'Subtitle', type: 'text' },
+          { name: 'description', label: 'Description', type: 'textarea' },
+          { name: 'buttonText', label: 'Button Text', type: 'text' },
+        ];
+      case 'about':
+        return [
+          { name: 'title', label: 'Title', type: 'text' },
+          { name: 'content', label: 'Content', type: 'textarea' },
+          { name: 'mission', label: 'Mission', type: 'textarea' },
+          { name: 'buttonText', label: 'Button Text', type: 'text' },
+        ];
+      case 'services':
+        return [
+          { 
+            name: 'services', 
+            label: 'Services', 
+            type: 'array',
+            fields: [
+              { name: 'icon', label: 'Icon', type: 'select', options: ['Palette', 'Code', 'Layout', 'Megaphone', 'Rocket', 'Shield'] },
+              { name: 'title', label: 'Title', type: 'text' },
+              { name: 'description', label: 'Description', type: 'textarea' },
+              { name: 'features', label: 'Features', type: 'array', maxItems: 4, itemType: 'text' },
+              { name: 'href', label: 'URL Path', type: 'text' },
+            ]
+          }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const renderField = (field: any) => {
+    switch (field.type) {
+      case 'text':
+        return (
+          <input
+            type="text"
+            value={content[field.name] || ''}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            className="w-full p-2 bg-white/10 rounded-md border border-white/20 text-white"
+          />
+        );
+      case 'textarea':
+        return (
+          <textarea
+            value={content[field.name] || ''}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            rows={4}
+            className="w-full p-2 bg-white/10 rounded-md border border-white/20 text-white"
+          />
+        );
+      case 'select':
+        return (
+          <select
+            value={content[field.name] || ''}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            className="w-full p-2 bg-white/10 rounded-md border border-white/20 text-white"
+          >
+            {field.options.map((option: string) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        );
+      case 'array':
+        if (field.itemType) {
+          // For simple arrays (like features)
+          const items = content[field.name] || [];
+          return (
+            <div className="space-y-2">
+              {items.map((item: string, index: number) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={item}
+                    onChange={(e) => {
+                      const newItems = [...items];
+                      newItems[index] = e.target.value;
+                      handleFieldChange(field.name, newItems);
+                    }}
+                    className="flex-1 p-2 bg-white/10 rounded-md border border-white/20 text-white"
+                  />
+                  <button
+                    onClick={() => {
+                      const newItems = items.filter((_: any, i: number) => i !== index);
+                      handleFieldChange(field.name, newItems);
+                    }}
+                    className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 rounded-md"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              {(!field.maxItems || items.length < field.maxItems) && (
+                <button
+                  onClick={() => handleFieldChange(field.name, [...items, ''])}
+                  className="px-3 py-1 bg-primary/20 hover:bg-primary/30 rounded-md"
+                >
+                  Add {field.label}
+                </button>
+              )}
+            </div>
+          );
+        } else {
+          // For complex arrays (like services)
+          const items = content[field.name] || [];
+          return (
+            <div className="space-y-4">
+              {items.map((item: any, index: number) => (
+                <div key={index} className="p-4 bg-white/5 rounded-lg space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-lg font-semibold">{field.label} #{index + 1}</h4>
+                    <button
+                      onClick={() => {
+                        const newItems = items.filter((_: any, i: number) => i !== index);
+                        handleFieldChange(field.name, newItems);
+                      }}
+                      className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 rounded-md"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  {field.fields.map((subField: any) => (
+                    <div key={subField.name} className="space-y-1">
+                      <label className="text-sm text-gray-300">{subField.label}</label>
+                      {subField.type === 'array' ? (
+                        // Render nested array (features)
+                        <div className="space-y-2">
+                          {(item[subField.name] || []).map((feature: string, featureIndex: number) => (
+                            <div key={featureIndex} className="flex gap-2">
+                              <input
+                                type="text"
+                                value={feature}
+                                onChange={(e) => {
+                                  const newItems = [...items];
+                                  const newFeatures = [...item[subField.name]];
+                                  newFeatures[featureIndex] = e.target.value;
+                                  newItems[index] = { ...item, [subField.name]: newFeatures };
+                                  handleFieldChange(field.name, newItems);
+                                }}
+                                className="flex-1 p-2 bg-white/10 rounded-md border border-white/20 text-white"
+                              />
+                              <button
+                                onClick={() => {
+                                  const newItems = [...items];
+                                  const newFeatures = item[subField.name].filter((_: any, i: number) => i !== featureIndex);
+                                  newItems[index] = { ...item, [subField.name]: newFeatures };
+                                  handleFieldChange(field.name, newItems);
+                                }}
+                                className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 rounded-md"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+                          {(!subField.maxItems || item[subField.name].length < subField.maxItems) && (
+                            <button
+                              onClick={() => {
+                                const newItems = [...items];
+                                const newFeatures = [...(item[subField.name] || []), ''];
+                                newItems[index] = { ...item, [subField.name]: newFeatures };
+                                handleFieldChange(field.name, newItems);
+                              }}
+                              className="px-3 py-1 bg-primary/20 hover:bg-primary/30 rounded-md"
+                            >
+                              Add Feature
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        // Render other field types
+                        <div>
+                          {subField.type === 'select' ? (
+                            <select
+                              value={item[subField.name] || ''}
+                              onChange={(e) => {
+                                const newItems = [...items];
+                                newItems[index] = { ...item, [subField.name]: e.target.value };
+                                handleFieldChange(field.name, newItems);
+                              }}
+                              className="w-full p-2 bg-white/10 rounded-md border border-white/20 text-white"
+                            >
+                              {subField.options.map((option: string) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                          ) : subField.type === 'textarea' ? (
+                            <textarea
+                              value={item[subField.name] || ''}
+                              onChange={(e) => {
+                                const newItems = [...items];
+                                newItems[index] = { ...item, [subField.name]: e.target.value };
+                                handleFieldChange(field.name, newItems);
+                              }}
+                              rows={3}
+                              className="w-full p-2 bg-white/10 rounded-md border border-white/20 text-white"
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              value={item[subField.name] || ''}
+                              onChange={(e) => {
+                                const newItems = [...items];
+                                newItems[index] = { ...item, [subField.name]: e.target.value };
+                                handleFieldChange(field.name, newItems);
+                              }}
+                              className="w-full p-2 bg-white/10 rounded-md border border-white/20 text-white"
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+              <button
+                onClick={() => {
+                  const newItem = field.fields.reduce((acc: any, subField: any) => {
+                    acc[subField.name] = subField.type === 'array' ? [] : '';
+                    return acc;
+                  }, {});
+                  handleFieldChange(field.name, [...items, newItem]);
+                }}
+                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 rounded-md w-full"
+              >
+                Add New {field.label.slice(0, -1)}
+              </button>
+            </div>
+          );
+        }
+        return null;
+      default:
+        return null;
+    }
   };
 
   if (loading) {
@@ -84,7 +328,7 @@ export default function ContentEditor({ section }: ContentEditorProps) {
     <div className="p-6 bg-white/5 backdrop-blur-lg rounded-xl border border-white/10">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-medium text-white">Edit {getSectionName(section)}</h2>
+          <h2 className="text-lg font-medium text-white">Edit {section}</h2>
           <button
             onClick={handleSave}
             disabled={saving}
@@ -125,80 +369,13 @@ export default function ContentEditor({ section }: ContentEditorProps) {
 
         <div className="space-y-6">
           {fields.map((field) => (
-            <div key={field.id} className="space-y-1">
-              <label htmlFor={field.id} className="block text-sm font-medium text-gray-200">
-                {field.label}
-              </label>
-              {field.type === 'textarea' ? (
-                <textarea
-                  id={field.id}
-                  rows={4}
-                  className="mt-2 block w-full rounded-lg bg-gray-900/50 border border-gray-700/50 text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 text-sm px-4 py-3 resize-y"
-                  value={content[field.id] || ''}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
-                  placeholder={`Enter ${field.label.toLowerCase()}`}
-                />
-              ) : (
-                <input
-                  type={field.type}
-                  id={field.id}
-                  className="mt-2 block w-full rounded-lg bg-gray-900/50 border border-gray-700/50 text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 text-sm h-11 px-4"
-                  value={content[field.id] || ''}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
-                  placeholder={`Enter ${field.label.toLowerCase()}`}
-                />
-              )}
+            <div key={field.name} className="space-y-1">
+              <label className="text-sm text-gray-300">{field.label}</label>
+              {renderField(field)}
             </div>
           ))}
         </div>
       </div>
     </div>
   );
-}
-
-function getSectionName(section: string): string {
-  const names: { [key: string]: string } = {
-    hero: 'Hero Section',
-    about: 'About Company',
-    services: 'Services',
-    work: 'Featured Work',
-    cta: 'CTA Section',
-  };
-  return names[section] || section;
-}
-
-function getFieldsForSection(section: string) {
-  const fields: { [key: string]: Array<{ id: string; label: string; type: string }> } = {
-    hero: [
-      { id: 'title', label: 'Title', type: 'text' },
-      { id: 'subtitle', label: 'Subtitle', type: 'text' },
-      { id: 'description', label: 'Description', type: 'textarea' },
-      { id: 'buttonText', label: 'Button Text', type: 'text' },
-      { id: 'buttonLink', label: 'Button Link', type: 'text' },
-    ],
-    about: [
-      { id: 'title', label: 'Title', type: 'text' },
-      { id: 'content', label: 'Content', type: 'textarea' },
-      { id: 'mission', label: 'Mission Statement', type: 'textarea' },
-      { id: 'vision', label: 'Vision Statement', type: 'textarea' },
-    ],
-    services: [
-      { id: 'title', label: 'Section Title', type: 'text' },
-      { id: 'description', label: 'Section Description', type: 'textarea' },
-      { id: 'services', label: 'Services (JSON)', type: 'textarea' },
-    ],
-    work: [
-      { id: 'title', label: 'Section Title', type: 'text' },
-      { id: 'description', label: 'Section Description', type: 'textarea' },
-      { id: 'projects', label: 'Projects (JSON)', type: 'textarea' },
-    ],
-    cta: [
-      { id: 'title', label: 'Title', type: 'text' },
-      { id: 'description', label: 'Description', type: 'textarea' },
-      { id: 'buttonText', label: 'Button Text', type: 'text' },
-      { id: 'buttonLink', label: 'Button Link', type: 'text' },
-    ],
-  };
-  
-  return fields[section] || [];
 }

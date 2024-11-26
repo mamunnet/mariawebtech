@@ -1,87 +1,74 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Palette, Code, Layout, Megaphone, Rocket, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { LucideIcon } from 'lucide-react';
 
-const services = [
-  {
-    icon: Palette,
-    title: 'UI/UX Design',
-    description: 'Create intuitive and engaging user experiences that delight your customers.',
-    features: [
-      'User Research & Analysis',
-      'Wireframing & Prototyping',
-      'Visual Design',
-      'Usability Testing',
-    ],
-    href: '/services/ui-ux-design',
-  },
-  {
-    icon: Code,
-    title: 'Web Development',
-    description: 'Build fast, scalable, and secure web applications using cutting-edge technologies.',
-    features: [
-      'Front-end Development',
-      'Back-end Development',
-      'API Integration',
-      'Database Design',
-    ],
-    href: '/services/web-development',
-  },
-  {
-    icon: Layout,
-    title: 'Responsive Design',
-    description: 'Ensure your website looks and works perfectly on all devices and screen sizes.',
-    features: [
-      'Mobile-First Design',
-      'Cross-Browser Compatibility',
-      'Performance Optimization',
-      'Accessibility Standards',
-    ],
-    href: '/services/responsive-design',
-  },
-  {
-    icon: Megaphone,
-    title: 'Digital Marketing',
-    description: 'Boost your online presence and reach your target audience effectively.',
-    features: [
-      'SEO Optimization',
-      'Content Strategy',
-      'Social Media Marketing',
-      'Analytics & Reporting',
-    ],
-    href: '/services/digital-marketing',
-  },
-  {
-    icon: Rocket,
-    title: 'E-commerce Solutions',
-    description: 'Create powerful online stores that drive sales and enhance customer experience.',
-    features: [
-      'Custom E-commerce Development',
-      'Payment Gateway Integration',
-      'Inventory Management',
-      'Shopping Cart Optimization',
-    ],
-    href: '/services/e-commerce',
-  },
-  {
-    icon: Shield,
-    title: 'Maintenance & Support',
-    description: 'Keep your digital assets secure, updated, and performing at their best.',
-    features: [
-      'Regular Updates & Backups',
-      'Security Monitoring',
-      'Performance Optimization',
-      '24/7 Technical Support',
-    ],
-    href: '/services/maintenance-support',
-  },
-];
+interface Service {
+  icon: string;
+  title: string;
+  description: string;
+  features: string[];
+  href: string;
+}
+
+const iconMap: Record<string, LucideIcon> = {
+  'Palette': Palette,
+  'Code': Code,
+  'Layout': Layout,
+  'Megaphone': Megaphone,
+  'Rocket': Rocket,
+  'Shield': Shield,
+};
+
+const defaultIcon = Code;
 
 export function ServicesSection() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const docRef = doc(db, 'content', 'services');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setServices(data.services || []);
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-24 relative overflow-hidden bg-black/95">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-64 bg-white/5 rounded-lg"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24 relative overflow-hidden bg-black/95">
       {/* Background decorative elements */}
@@ -165,45 +152,48 @@ export function ServicesSection() {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Link href={service.href}>
-                <Card className="h-full hover:bg-muted/50 transition-colors duration-300 cursor-pointer group">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300">
-                      <service.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle className="group-hover:text-primary transition-colors duration-300">
-                      {service.title}
-                    </CardTitle>
-                    <CardDescription>{service.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 mb-6">
-                      {service.features.map((feature) => (
-                        <li key={feature} className="flex items-center text-sm text-muted-foreground">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <Button 
-                      variant="outline" 
-                      className="w-full group-hover:bg-primary group-hover:text-white transition-colors duration-300"
-                    >
-                      Learn More
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
+          {services.map((service, index) => {
+            const IconComponent = iconMap[service.icon] || defaultIcon;
+            return (
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Link href={service.href}>
+                  <Card className="h-full hover:bg-muted/50 transition-colors duration-300 cursor-pointer group">
+                    <CardHeader>
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300">
+                        <IconComponent className="h-6 w-6 text-primary" />
+                      </div>
+                      <CardTitle className="group-hover:text-primary transition-colors duration-300">
+                        {service.title}
+                      </CardTitle>
+                      <CardDescription>{service.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 mb-6">
+                        {service.features.map((feature: string) => (
+                          <li key={feature} className="flex items-center text-sm text-muted-foreground">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      <Button 
+                        variant="outline" 
+                        className="w-full group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+                      >
+                        Learn More
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* View All Services Button */}

@@ -85,6 +85,8 @@ export function TeamSection() {
                     src={member.image}
                     alt={member.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    quality={90}
                     className="object-cover"
                   />
                 </div>

@@ -65,6 +65,8 @@ export function TestimonialsSection() {
                         src={testimonial.image}
                         alt={testimonial.author}
                         fill
+                        sizes="(max-width: 768px) 96px, 48px"
+                        quality={90}
                         className="object-cover"
                       />
                     </div>
