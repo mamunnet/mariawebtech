@@ -90,60 +90,115 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="space-y-4"
+          className="space-y-8"
         >
-          <div className="relative">
-            {/* Animated SVG Path */}
-            <svg
-              className="absolute -inset-2 w-[calc(100%+1.5rem)] h-[calc(100%+1.5rem)] pointer-events-none"
-              style={{ filter: 'blur(1px)' }}
+          <div className="relative space-y-6">
+            <motion.div 
+              className="relative mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             >
-              <motion.path
-                d="M20 20 Q 150 10, 280 20 Q 350 30, 420 20 Q 500 10, 580 20"
-                stroke="url(#gradient)"
-                strokeWidth="4"
-                fill="none"
-                initial="initial"
-                animate="animate"
-                variants={pathVariants}
-              />
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#F6202C" />
-                  <stop offset="50%" stopColor="#FFD700" />
-                  <stop offset="100%" stopColor="#F6202C" />
-                </linearGradient>
-              </defs>
-            </svg>
+              <div className="relative inline-block">
+                {/* Background glow effect */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                  className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-yellow-500/20 to-primary/20 rounded-lg blur-xl"
+                />
+                
+                {/* Top line with glow */}
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: "60%", opacity: 1 }}
+                  transition={{ duration: 1, delay: 0.2 }}
+                  className="absolute -top-4 left-0 h-[3px] rounded-full bg-gradient-to-r from-transparent via-primary to-transparent"
+                  style={{
+                    boxShadow: '0 0 10px var(--primary)'
+                  }}
+                />
 
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-primary relative z-10">
-              {heroContent.title.split(' ').map((word, index) => (
-                <span key={index} className={word.toLowerCase() === 'digital' ? 'text-primary' : ''}>
-                  {word}{' '}
-                  {index === 2 && <br />}
-                </span>
-              ))}
-            </h1>
+                {/* Main title */}
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="relative"
+                >
+                  <h1 className="text-4xl sm:text-5xl font-bold relative py-2">
+                    <span className="relative inline-block overflow-hidden">
+                      {/* Shimmer effect */}
+                      <motion.div
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          ease: "linear",
+                        }}
+                        className="absolute inset-0 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                      />
+                      
+                      {/* Title text */}
+                      <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-primary via-yellow-500 to-primary">
+                        {heroContent.title}
+                      </span>
+                    </span>
+                  </h1>
 
-            {/* Bottom decorative line */}
-            <motion.div
-              className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-primary via-yellow-500 to-primary"
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{
-                duration: 1.5,
-                ease: "easeInOut",
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            />
+                  {/* Bottom line with glow */}
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                    className="absolute -bottom-2 left-0 right-0 h-[2px] origin-left rounded-full bg-gradient-to-r from-primary via-yellow-500 to-primary"
+                    style={{
+                      boxShadow: '0 0 10px var(--primary)'
+                    }}
+                  />
+
+                  {/* Side accent lines */}
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: "100%" }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="absolute -left-6 top-0 w-[2px] rounded-full bg-gradient-to-b from-primary to-transparent"
+                    style={{
+                      boxShadow: '0 0 8px var(--primary)'
+                    }}
+                  />
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: "100%" }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="absolute -right-6 top-0 w-[2px] rounded-full bg-gradient-to-b from-primary to-transparent"
+                    style={{
+                      boxShadow: '0 0 8px var(--primary)'
+                    }}
+                  />
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
 
-          <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-xl mt-3">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="text-xl text-muted-foreground max-w-xl"
+          >
             {heroContent.description}
-          </p>
+          </motion.p>
 
-          <div className="flex flex-wrap gap-3 mt-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex gap-4"
+          >
             <Button 
               size="lg"
               className="bg-primary hover:bg-primary/90 text-base"
@@ -161,7 +216,7 @@ export function HeroSection() {
                 View Our Work
               </Link>
             </Button>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* 3D Animation */}
